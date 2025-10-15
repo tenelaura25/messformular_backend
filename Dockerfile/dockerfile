@@ -1,0 +1,17 @@
+# Image officielle PHP avec Apache
+FROM php:8.2-apache
+
+# Installer les extensions nécessaires (mysqli, PDO)
+RUN docker-php-ext-install mysqli pdo pdo_mysql
+
+# Copier le code source dans le dossier web d’Apache
+COPY ./public /var/www/html/
+
+# Donner les droits nécessaires à Apache
+RUN chown -R www-data:www-data /var/www/html
+
+# Exposer le port web
+EXPOSE 80
+
+# Lancer Apache par défaut
+CMD ["apache2-foreground"]
