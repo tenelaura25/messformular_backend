@@ -1,21 +1,35 @@
 
-# Image officielle PHP avec Apache
+
+
+
+
+
+
+
+# Image PHP avec Apache
 FROM php:8.2-apache
 
-# Installer les extensions nécessaires (mysqli, PDO)
+# Installer les extensions PHP
 RUN docker-php-ext-install mysqli pdo pdo_mysql
+
+# Activer le module PHP pour Apache
+RUN a2enmod php8.2
+
+# (Optionnel) Activer le module rewrite si tu en as besoin
+RUN a2enmod rewrite
 
 # Copier le code source dans le dossier web d’Apache
 COPY ./public /var/www/html/
 
-# Donner les droits nécessaires à Apache
+# Donner les bons droits
 RUN chown -R www-data:www-data /var/www/html
 
-# Exposer le port dynamique utilisé par Railway
-EXPOSE 8080
+# Adapter la configuration Apache au port fourni par Railway
+RUN sed -i "s/Listen 80/Listen ${PORT}/" /etc/apache2/ports.conf && \
+    sed -i "s/:80/:${PORT}/" /etc/apache2/sites-available/000-default.conf
 
-# Configurer Apache pour écouter sur le bon port
-RUN sed -i 's/80/${PORT}/g' /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf
+# Exposer le port dynamique
+EXPOSE 8080
 
 # Lancer Apache
 CMD ["apache2-foreground"]
