@@ -4,10 +4,10 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Récupère les variables d'environnement (Railway les définit automatiquement)
-$host = getenv('MYSQL_HOST') ?: 'localhost';
-$user = getenv('MYSQLUSER') ?: getenv('MYSQL_USER');
-$pass = getenv('MYSQLPASSWORD') ?: getenv('MYSQL_PASSWORD');
-$db   = getenv('MYSQLDATABASE') ?: getenv('MYSQL_DATABASE');
+$host = getenv('MYSQL_HOST') ?: 'mysql.railway.internal';
+$user = getenv('MYSQLUSER') ?: 'root';
+$pass = getenv('MYSQLPASSWORD') ?:'kNNCYGDndpgdxYTYvONRZxcHWaPIRIYB';
+$db   = getenv('MYSQLDATABASE') ?: 'railway';
 
 // Connexion MySQL
 $conn = new mysqli($host, $user, $pass, $db);
