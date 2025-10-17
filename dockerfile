@@ -11,11 +11,12 @@ COPY . /app
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Exposer le port dynamique utilisé par Railway
+# Exposer le port utilisé par Railway
 EXPOSE 8080
 
-# Lancer le serveur PHP interne sur le port fourni par Railway
-CMD ["php", "-S", "0.0.0.0:${PORT:-8080}", "-t", "public"]
+# Démarrer le serveur PHP interne sur le bon port
+CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t public"]
+
 
 
 
