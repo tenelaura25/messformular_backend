@@ -14,4 +14,4 @@ WORKDIR /app
 EXPOSE 8080
 
 # Démarrer le serveur PHP interne sur le port Railway
-CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t /app/public"]
+CMD ["php", "-S", "0.0.0.0:8080", "-t", "/app/public"]
