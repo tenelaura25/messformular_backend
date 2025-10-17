@@ -11,6 +11,8 @@ RUN apt-get update && \
         curl \
         zip \
         unzip \
+        # AJOUT CRITIQUE : Librairie de développement MySQL pour mysqli et pdo_mysql
+        default-libmysqlclient-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # 2. Installer et ACTIVER les extensions PHP
