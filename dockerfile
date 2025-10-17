@@ -1,4 +1,3 @@
-
 # Utiliser PHP 8.2 CLI
 FROM php:8.2-cli
 
@@ -11,14 +10,8 @@ COPY . /app
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Exposer le port utilisé par Railway
+# Exposer le port 8080 (par défaut utilisé par Railway)
 EXPOSE 8080
 
-# Démarrer le serveur PHP interne sur le bon port
+# Démarrer le serveur PHP interne sur le port Railway
 CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t public"]
-
-
-
-
-
-
