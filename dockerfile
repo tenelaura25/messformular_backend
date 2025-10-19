@@ -1,43 +1,24 @@
-# Utiliser l'image PHP 8.2 avec Apache (pour un serveur web complet)
+# ÉTAPE 1 : Utiliser l'image PHP Apache
+# Nous utilisons l'image 'apache' car elle est conçue pour servir des applications web.
 FROM php:8.2-apache
 
-# 1. Installer les dépendances système nécessaires
+# ÉTAPE 2 : Installer les dépendances système pour mysqli et PDO
+# Ces librairies sont nécessaires pour compiler correctement les extensions de base de données.
 RUN apt-get update && \
     apt-get install -y \
+        libmariadb-dev \
         libzip-dev \
-        libpng-dev \
-        libjpeg-dev \
-        libwebp-dev \
-        curl \
-        zip \
-        unzip \
-        # AJOUT CRITIQUE : Librairie de développement MySQL pour mysqli et pdo_mysql
-        default-libmysqlclient-dev \
-    && rm -rf /var/lib/apt/lists/*
+        && \
+    rm -rf /var/lib/apt/lists/*
 
-# 2. Installer et ACTIVER les extensions PHP
-#    Les extensions de base de données (mysqli, pdo_mysql) doivent être installées
-#    directement. J'ai ajouté l'installation explicite de mysqli ici.
-RUN docker-php-ext-configure gd --with-webp --with-jpeg
-RUN docker-php-ext-install -j$(nproc) \
-    gd \
-    opcache \
-    zip \
-    # Extensions de base de données :
-    mysqli \
-    pdo \
-    pdo_mysql
+# ÉTAPE 3 : Installer et activer les extensions PHP
+# mysqli et pdo_mysql pour la connexion à la base de données.
+# zip est souvent nécessaire pour les outils de composer/PHP modernes.
+RUN docker-php-ext-install -j$(nproc) mysqli pdo pdo_mysql zip
 
-# 3. Configurer le répertoire de travail d'Apache
-#    La racine web d'Apache est par défaut /var/www/html
-WORKDIR /var/www/html
-
-# 4. Supprimer le fichier index.html par défaut d'Apache
-RUN rm -rf /var/www/html/index.html
-
-# 5. Copier le contenu de votre projet dans le répertoire de travail d'Apache
+# ÉTAPE 4 : Copier l'application dans le répertoire web d'Apache
+# Le répertoire par défaut d'Apache est /var/www/html
 COPY . /var/www/html
 
-# 6. Modifier la configuration d'Apache
-#    Permet à Apache d'utiliser les fichiers .htaccess pour la réécriture d'URL
-RUN a2enmod rewrite
+# Le serveur web est déjà lancé par l'image de base (apache2),
+# donc aucune commande CMD n'est nécessaire.
