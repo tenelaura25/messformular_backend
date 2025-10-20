@@ -1,24 +1,26 @@
-# ÉTAPE 1 : Utiliser l'image PHP Apache
-# Nous utilisons l'image 'apache' car elle est conçue pour servir des applications web.
+
+# Utiliser l'image PHP 8.2 avec Apache (standard pour une application web)
 FROM php:8.2-apache
 
-# ÉTAPE 2 : Installer les dépendances système pour mysqli et PDO
-# Ces librairies sont nécessaires pour compiler correctement les extensions de base de données.
-RUN apt-get update && \
-    apt-get install -y \
-        libmariadb-dev \
-        libzip-dev \
-        && \
-    rm -rf /var/lib/apt/lists/*
+# Installer les dépendances système et les extensions PHP en une seule étape
+# Cela garantit que le cache Docker ne saute pas la partie 'apt-get install'
+# juste avant 'docker-php-ext-install'.
+RUN apt-get update && apt-get install -y \
+    libmariadb-dev \
+    libzip-dev \
+    # Nettoyer après l'installation
+    && rm -rf /var/lib/apt/lists/* \
+    \
+    # Installer les extensions de base de données (mysqli et pdo_mysql)
+    # -j$(nproc) utilise tous les cœurs pour accélérer la compilation
+    && docker-php-ext-install -j$(nproc) mysqli pdo_mysql \
+    \
+    # Copier le contenu du projet dans le répertoire web d'Apache
+    && COPY . /var/www/html
 
-# ÉTAPE 3 : Installer et activer les extensions PHP
-# mysqli et pdo_mysql pour la connexion à la base de données.
-# zip est souvent nécessaire pour les outils de composer/PHP modernes.
-RUN docker-php-ext-install -j$(nproc) mysqli pdo pdo_mysql zip
+# Exposer le port 80 (standard pour Apache)
+# Railway redirigera automatiquement le trafic depuis 443/80 vers ce port
+EXPOSE 80
 
-# ÉTAPE 4 : Copier l'application dans le répertoire web d'Apache
-# Le répertoire par défaut d'Apache est /var/www/html
-COPY . /var/www/html
-
-# Le serveur web est déjà lancé par l'image de base (apache2),
-# donc aucune commande CMD n'est nécessaire.
+# La commande par défaut d'Apache (httpd-foreground) est utilisée
+CMD ["apache2-foreground"]
