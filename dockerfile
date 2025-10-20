@@ -2,17 +2,19 @@
 FROM php:8.2-apache
 
 # ÉTAPE 1: Installer les dépendances système et les extensions PHP
-# Cela se fait en une seule commande RUN pour garantir que toutes les dépendances sont là.
 RUN apt-get update && apt-get install -y \
     libmariadb-dev \
     libzip-dev \
+    # Configurer mysqli de manière explicite pour éviter les problèmes de chemin
+    && docker-php-ext-configure mysqli --with-mysqli=mysql \
+    \
     # Installer les extensions de base de données (mysqli et pdo_mysql)
     && docker-php-ext-install -j$(nproc) mysqli pdo_mysql \
+    \
     # Nettoyer après l'installation
     && rm -rf /var/lib/apt/lists/*
 
 # ÉTAPE 2: Copier le contenu du projet dans le répertoire web d'Apache
-# NOTE : COPY doit être une instruction séparée, pas dans le RUN
 COPY . /var/www/html
 
 # ÉTAPE 3: Configuration du serveur
